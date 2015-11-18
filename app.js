@@ -44,7 +44,7 @@ app.post('/', upload.single('file'), function (req, res, next) {
     deleteAfterUpload(newPath);
     var downloadPath = newPath.substring(8, 13);
 
-    res.send('the download link for your file is: ' + 'http://localhost:3000/download/' + downloadPath + '/' + req.file.originalname);
+    res.send('the download link for your file is: ' + 'http://159.203.246.52:3000/download/' + downloadPath + '/' + req.file.originalname);
     //res.render('index', {title: 'Express'});
 
 });
@@ -56,12 +56,9 @@ app.get('/download/:folder/:filename', function (req, res, next) {
     res.download(__dirname + '/uploads' + '/' + folder + '/' + filename, filename, function (err) {
         if (err) {
             console.log(err);
-        } else {
-            // decrement a download credit, etc.
+            res.end();
         }
     });
-    //res.end();
-    //res.download('index', {title: 'Express'});
 });
 
 var deleteAfterUpload = function (path) {
