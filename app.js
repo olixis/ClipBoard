@@ -6,6 +6,7 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var multer = require('multer');
 var fs = require('fs');
+var adfly = require("adf.ly")("653bc0a7d5a4dcd20b98e7c0c2534f0b");
 
 
 var storage = multer.diskStorage({
@@ -20,7 +21,12 @@ var storage = multer.diskStorage({
     }
 });
 
-var upload = multer({storage: storage});
+var limits = {
+    files: 1,
+    fileSize: 101000000 // 100 MB
+};
+
+var upload = multer({storage: storage, limits: limits});
 
 
 var routes = require('./routes/index');
@@ -37,14 +43,20 @@ app.get('/', function (req, res, next) {
     res.render('index', {title: 'Express'});
 });
 
+
 app.post('/', upload.single('file'), function (req, res, next) {
     var path = req.file.path;
     var newPath = path.substring(0, 14) + req.file.originalname;
+    console.log(req.ip+ "uploaded: "+ req.file.originalname);
     fs.renameSync(path, newPath);
     deleteAfterUpload(newPath);
     var downloadPath = newPath.substring(8, 13);
+    adfly.short('http://blinkload.com/download/' + downloadPath + '/' + req.file.originalname, function (url) {
+        res.send('The download link for your file is: ' + url);
+    });
 
-    res.send('the download link for your file is: ' + 'http://159.203.246.52:3000/download/' + downloadPath + '/' + req.file.originalname);
+
+    //res.send('The download link for your file is: ' + link);
     //res.render('index', {title: 'Express'});
 
 });
@@ -52,7 +64,7 @@ app.post('/', upload.single('file'), function (req, res, next) {
 app.get('/download/:folder/:filename', function (req, res, next) {
     var filename = req.params.filename;
     var folder = req.params.folder;
-    console.log(__dirname + '\\uploads' + '\\' + folder + '\\' + filename);
+    console.log(req.ip+ "downloaded: "+ folder + '\\' + filename);
     res.download(__dirname + '/uploads' + '/' + folder + '/' + filename, filename, function (err) {
         if (err) {
             console.log(err);
@@ -67,14 +79,22 @@ var deleteAfterUpload = function (path) {
             if (err) console.log(err);
             console.log('file ' + path + ' successfully deleted');
         });
-    }, 50000);
+    }, 60 * 150000);
 };
+
+function errorHandler(err, req, res, next) {
+    //console.error(err.stack)
+    console.error(err.status = 500);
+    res.status(500);
+    res.render('error', {error: err});
+}
 
 
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(logger('dev'));
 app.use(bodyParser.json());
+app.use(errorHandler);
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
@@ -82,36 +102,36 @@ app.use(express.static(path.join(__dirname, 'public')));
 //app.use('/', routes);
 app.use('/users', users);
 
-// catch 404 and forward to error handler
+//catch 404 and forward to error handler
 app.use(function (req, res, next) {
     var err = new Error('Not Found');
     err.status = 404;
-    next(err);
+    res.render('error', {error: err})
 });
-
-// error handlers
-
-// development error handler
-// will print stacktrace
-if (app.get('env') === 'development') {
-    app.use(function (err, req, res, next) {
-        res.status(err.status || 500);
-        res.render('error', {
-            message: err.message,
-            error: err
-        });
-    });
-}
-
-// production error handler
-// no stacktraces leaked to user
-app.use(function (err, req, res, next) {
-    res.status(err.status || 500);
-    res.render('error', {
-        message: err.message,
-        error: {}
-    });
-});
+//
+//// error handlers
+//
+//// development error handler
+//// will print stacktrace
+//if (app.get('env') === 'development') {
+//    app.use(function (err, req, res, next) {
+//        res.status(err.status || 500);
+//        res.render('error', {
+//            message: err.message,
+//            error: err
+//        });
+//    });
+//}
+//
+//// production error handler
+//// no stacktraces leaked to user
+//app.use(function (err, req, res, next) {
+//    res.status(err.status || 500);
+//    res.render('error', {
+//        message: err.message,
+//        error: {}
+//    });
+//});
 function makeid() {
     var text = "";
     var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
