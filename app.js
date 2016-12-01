@@ -26,7 +26,7 @@ var limits = {
     fileSize: 101000000 // 100 MB
 };
 
-var upload = multer({storage: storage, limits: limits});
+var upload = multer({ storage: storage, limits: limits });
 
 
 var routes = require('./routes/index');
@@ -40,20 +40,19 @@ app.set('view engine', 'jade');
 
 
 app.get('/', function (req, res, next) {
-    res.render('index', {title: 'Express'});
+    res.render('index', { title: 'Express' });
 });
 
 
 app.post('/', upload.single('file'), function (req, res, next) {
     var path = req.file.path;
     var newPath = path.substring(0, 14) + req.file.originalname;
-    console.log(req.ip+ "uploaded: "+ req.file.originalname);
+    console.log(req.ip + "uploaded: " + req.file.originalname);
     fs.renameSync(path, newPath);
     deleteAfterUpload(newPath);
     var downloadPath = newPath.substring(8, 13);
-    adfly.short('http://blinkload.com/download/' + downloadPath + '/' + req.file.originalname, function (url) {
-        res.send('The download link for your file is: ' + url);
-    });
+    var url = 'http://blinkload.com/download/' + downloadPath + '/' + req.file.originalname;
+    res.send('The download link for your file is: ' + url);
 
 
     //res.send('The download link for your file is: ' + link);
@@ -64,7 +63,7 @@ app.post('/', upload.single('file'), function (req, res, next) {
 app.get('/download/:folder/:filename', function (req, res, next) {
     var filename = req.params.filename;
     var folder = req.params.folder;
-    console.log(req.ip+ "downloaded: "+ folder + '\\' + filename);
+    console.log(req.ip + "downloaded: " + folder + '\\' + filename);
     res.download(__dirname + '/uploads' + '/' + folder + '/' + filename, filename, function (err) {
         if (err) {
             console.log(err);
@@ -77,16 +76,18 @@ var deleteAfterUpload = function (path) {
     setTimeout(function () {
         fs.unlink(path, function (err) {
             if (err) console.log(err);
+            var dir = path.substring(0,13);
+            fs.rmdirSync(dir);
             console.log('file ' + path + ' successfully deleted');
         });
-    }, 60 * 150000);
+    }, 10 * 1000);
 };
 
 function errorHandler(err, req, res, next) {
     //console.error(err.stack)
     console.error(err.status = 500);
     res.status(500);
-    res.render('error', {error: err});
+    res.render('error', { error: err });
 }
 
 
@@ -95,7 +96,7 @@ function errorHandler(err, req, res, next) {
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(errorHandler);
-app.use(bodyParser.urlencoded({extended: false}));
+app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -106,7 +107,7 @@ app.use('/users', users);
 app.use(function (req, res, next) {
     var err = new Error('Not Found');
     err.status = 404;
-    res.render('error', {error: err})
+    res.render('error', { error: err })
 });
 //
 //// error handlers
