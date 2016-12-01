@@ -51,7 +51,7 @@ app.post('/', upload.single('file'), function (req, res, next) {
     fs.renameSync(path, newPath);
     deleteAfterUpload(newPath);
     var downloadPath = newPath.substring(8, 13);
-    var url = 'http://blinkload.com/download/' + downloadPath + '/' + req.file.originalname;
+    var url = 'http://whisperfiles.host/download/' + downloadPath + '/' + req.file.originalname;
     res.send('The download link for your file is: ' + url);
 
 
