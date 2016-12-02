@@ -36,11 +36,13 @@ var app = express();
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'jade');
+app.set('view engine', 'ejs');
+app.engine('html', require('ejs').renderFile);
+//app.set("view options", {layout: false});
 
 
 app.get('/', function (req, res, next) {
-    res.render('index', { title: 'Express' });
+    res.render('index.ejs');
 });
 
 
@@ -87,7 +89,7 @@ function errorHandler(err, req, res, next) {
     //console.error(err.stack)
     console.error(err.status = 500);
     res.status(500);
-    res.render('error', { error: err });
+    res.send(err);
 }
 
 
