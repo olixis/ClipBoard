@@ -1,8 +1,48 @@
-extends layout
+doctype html
+html(lang='en')
+    head
+        meta(http-equiv='Content-Type', content='text/html; charset=UTF-8')
+        meta(name='viewport', content='width=device-width, initial-scale=1, maximum-scale=1.0')
+        title ClipBoard
+        // CSS
+        link(href='https://fonts.googleapis.com/icon?family=Material+Icons', rel='stylesheet')
+        link(href='css/materialize.css', type='text/css', rel='stylesheet', media='screen,projection')
+        link(href='css/style.css', type='text/css', rel='stylesheet', media='screen,projection')
+    body
+        main
+            #index-banner.section.no-pad-bot
+                .container
+                    h1.header.center.indigo-text.text-darken-2 ClipBoard
+                        img(src='img/clipse.svg')
+                    .row.center
+                        form(action='/', method='post', enctype='multipart/form-data')
+                            .file-field.input-field.col.s6.offset-s2
+                                .btn.waves-effect.waves-dark.indigo
+                                    span File
+                                    input(type='file', name='file')
+                                .file-path-wrapper
+                                    input.file-path.validate(type='text')
+                            .file-field.input-field.col.s3
+                                button.btn.indigo.waves-effect.waves-light(id='btnUp' type='submit', name='test' disabled)
+                                    | Clip It!
+                                    i.material-icons.right swap_vert        
+                            .g-recaptcha.col.s3.offset-s4(id='recaptcha')
+                    .row-center
+                        .col.s3
+                            .container.center-align
+                                | By solving the captcha you agree with our  
+                                a.indigo-text.text-lighten-3(href='tos') Terms of Service
+                                    
+                             
+        footer.page-footer.indigo
+            .footer-copyright
+                .container
+                    | Made by 
+                    a.deep-purple-text.text-lighten-3(href='http://materializecss.com') Materialize
+        // Scripts
+        script(src='https://code.jquery.com/jquery-2.1.1.min.js')
+        script(src='js/materialize.js')
+        script(src='js/init.js')
+        script(async defer src='https://www.google.com/recaptcha/api.js?onload=onloadCallback&render=explicit')
+        script(src='js/test.js')
 
-block content
-  h1= title
-  p Welcome to #{title}
-  form(action="/", method="post", enctype="multipart/form-data")
-    //input(type="file", name="file")
-   // input(type="submit", name="upload")

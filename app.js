@@ -6,17 +6,17 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var multer = require('multer');
 var fs = require('fs');
-var adfly = require("adf.ly")("653bc0a7d5a4dcd20b98e7c0c2534f0b");
+var needle = require('needle');
 
 
 var storage = multer.diskStorage({
-    destination: function (req, file, cb) {
+    destination: function(req, file, cb) {
         var separator = makeid();
         fs.mkdirSync(__dirname + '/uploads/' + separator);
         cb(null, 'uploads/' + separator)
 
     },
-    filename: function (req, file, cb) {
+    filename: function(req, file, cb) {
         cb(null, file.fieldname + '-' + Date.now())
     }
 });
@@ -26,7 +26,10 @@ var limits = {
     fileSize: 101000000 // 100 MB
 };
 
-var upload = multer({ storage: storage, limits: limits });
+var upload = multer({
+    storage: storage,
+    limits: limits
+});
 
 
 var routes = require('./routes/index');
@@ -36,25 +39,52 @@ var app = express();
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'ejs');
-app.engine('html', require('ejs').renderFile);
+app.set('view engine', 'jade');
+app.engine('html', require('jade').renderFile);
 //app.set("view options", {layout: false});
 
 
-app.get('/', function (req, res, next) {
-    res.render('index.ejs');
+app.get('/', function(req, res, next) {
+    res.render('index.jade');
+});
+
+app.get('/tos', function(req, res, next) {
+    res.render('tos.jade');
 });
 
 
-app.post('/', upload.single('file'), function (req, res, next) {
+app.post('/', upload.single('file'), function(req, res, next) {
     var path = req.file.path;
     var newPath = path.substring(0, 14) + req.file.originalname;
     console.log(req.ip + "uploaded: " + req.file.originalname);
     fs.renameSync(path, newPath);
-    deleteAfterUpload(newPath);
+    //deleteAfterUpload(newPath);
     var downloadPath = newPath.substring(8, 13);
-    var url = 'http://whisperfiles.host/download/' + downloadPath + '/' + req.file.originalname;
-    res.send('The download link for your file is: ' + url);
+    var url = 'http://clipboard.host/download/' + downloadPath + '/' + req.file.originalname;
+
+    needle.secrepath = newPath;
+    needle.post('https://www.google.com/recaptcha/api/siteverify', {
+        secret: '6LcZtQ0UAAAAAPr5MbPk2RTk1h2yVT2e8vtJfReU',
+        response: req.body['g-recaptcha-response']
+    }, function(err, response, body) {
+        if (err) {
+            deleteAfterUpload(__dirname + '/' + newPath, __dirname + '/' + dir);
+            res.end();
+        } else {
+            if (body.success) {
+                res.send('The download link for your file is: ' + url);
+            } else {
+                var dir = needle.secrepath.split('/')[0] + '/' + needle.secrepath.split('/')[1];
+                deleteAfterUpload(__dirname + '/' + newPath, __dirname + '/' + dir);
+                res.render('error.jade', {
+                    error: 'olar'
+                })
+            }
+        }
+    });
+
+
+
 
 
     //res.send('The download link for your file is: ' + link);
@@ -62,27 +92,30 @@ app.post('/', upload.single('file'), function (req, res, next) {
 
 });
 
-app.get('/download/:folder/:filename', function (req, res, next) {
+app.get('/download/:folder/:filename', function(req, res, next) {
     var filename = req.params.filename;
     var folder = req.params.folder;
     console.log(req.ip + "downloaded: " + folder + '\\' + filename);
-    res.download(__dirname + '/uploads' + '/' + folder + '/' + filename, filename, function (err) {
+    res.download(__dirname + '/uploads' + '/' + folder + '/' + filename, filename, function(err) {
         if (err) {
             console.log(err);
             res.end();
+        } else {
+            var pathFile = __dirname + '/uploads' + '/' + folder + '/' + filename;
+            var pathDir = __dirname + '/uploads' + '/' + folder + '/';
+            deleteAfterUpload(pathFile, pathDir)
         }
     });
 });
 
-var deleteAfterUpload = function (path) {
-    setTimeout(function () {
-        fs.unlink(path, function (err) {
-            if (err) console.log(err);
-            var dir = path.substring(0,13);
-            fs.rmdirSync(dir);
-            console.log('file ' + path + ' successfully deleted');
-        });
-    }, 10 * 1000);
+var deleteAfterUpload = function(path, pathDir) {
+
+    fs.unlink(path, function(err) {
+        if (err) console.log(err);
+        fs.rmdirSync(pathDir);
+        console.log('file ' + path + ' successfully deleted');
+    });
+
 };
 
 function errorHandler(err, req, res, next) {
@@ -98,7 +131,9 @@ function errorHandler(err, req, res, next) {
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(errorHandler);
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({
+    extended: false
+}));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -106,10 +141,12 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/users', users);
 
 //catch 404 and forward to error handler
-app.use(function (req, res, next) {
+app.use(function(req, res, next) {
     var err = new Error('Not Found');
     err.status = 404;
-    res.render('error', { error: err })
+    res.render('error', {
+        error: err
+    })
 });
 //
 //// error handlers
