@@ -6,22 +6,25 @@ html(lang='en')
         title ClipBoard
         // CSS
         link(href='https://fonts.googleapis.com/icon?family=Material+Icons', rel='stylesheet')
-        link(href='css/materialize.css', type='text/css', rel='stylesheet', media='screen,projection')
+        link(href='css/materialize.min.css', type='text/css', rel='stylesheet', media='screen,projection')
         link(href='css/style.css', type='text/css', rel='stylesheet', media='screen,projection')
     body
         main
             #index-banner.section.no-pad-bot
                 .container
-                    h1.header.center.indigo-text.text-darken-2 ClipBoard
+                    h1.header.center.indigo-text.text-darken-2 ClipBoard 
                         img(src='img/clipse.svg')
+                        span.indigo-text.text-darken-2(style="font-size: xx-small") alpha!
+                        
+                        
                     .row.center
                         form(action='/', method='post', enctype='multipart/form-data')
                             .file-field.input-field.col.s6.offset-s2
                                 .btn.waves-effect.waves-dark.indigo
-                                    span File
+                                    span Choose File
                                     input(type='file', name='file')
                                 .file-path-wrapper
-                                    input.file-path.validate(type='text')
+                                    input.file-path.validate(type='text' placeholder="Max.100MB")
                             .file-field.input-field.col.s3
                                 button.btn.indigo.waves-effect.waves-light(id='btnUp' type='submit', name='test' disabled)
                                     | Clip It!
@@ -31,18 +34,23 @@ html(lang='en')
                         .col.s3
                             .container.center-align
                                 | By solving the captcha you agree with our  
-                                a.indigo-text.text-lighten-3(href='tos') Terms of Service
+                                a.indigo-text.text-lighten-2(href='tos') Terms of Service
+                    .progress(style="display: none")
+                        .determinate(style="width: 0%")
+                    #status.center-align.deep-purple-text
+ 
+        
                                     
                              
         footer.page-footer.indigo
             .footer-copyright
                 .container
-                    | Made by 
-                    a.deep-purple-text.text-lighten-3(href='http://materializecss.com') Materialize
+                    a.deep-purple-text.text-lighten-4(href='/about') About
         // Scripts
         script(src='https://code.jquery.com/jquery-2.1.1.min.js')
-        script(src='js/materialize.js')
+        script(src="http://malsup.github.com/jquery.form.js")
+        script(src='js/materialize.min.js')
         script(src='js/init.js')
         script(async defer src='https://www.google.com/recaptcha/api.js?onload=onloadCallback&render=explicit')
-        script(src='js/test.js')
+        script(src='js/c.min.js')
 
