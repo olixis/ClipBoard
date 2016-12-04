@@ -1,0 +1,44 @@
+doctype html
+html(lang='en')
+    head
+        meta(http-equiv='Content-Type', content='text/html; charset=UTF-8')
+        meta(name='viewport', content='width=device-width, initial-scale=1, maximum-scale=1.0')
+        title ClipBoard
+        // CSS
+        link(href='https://fonts.googleapis.com/icon?family=Material+Icons', rel='stylesheet')
+        link(href='css/materialize.css', type='text/css', rel='stylesheet', media='screen,projection')
+        link(href='css/style.css', type='text/css', rel='stylesheet', media='screen,projection')
+    body
+        main
+            #index-banner.section.no-pad-bot
+                .container
+                    .row.center
+                       h1 About
+                            p.flow-text
+                                | ClipBoard.host is an experimental project in its alpha stage.
+                            p.flow-text
+                                |  It gives you the opportunity to upload a up to 100mb file to the cloud, and download it when needed, once, like a transfer area.
+                            p.flow-text.red-text
+                                | Please note that at this moment of the project we cannot guarantee the safety nor the integrity of the uploaded files.
+                            p.flow-text.red-text
+                                |  We suggest you to avoid uploading personal or critical files to this service at this moment.
+                            p.flow-text
+                                | Thank you for joining the ClipBoard.host alpha test. For more information read our:
+                            p.flow-text
+                            a.deep-purple-text.text-lighten-3(href='/tos') Terms of Service
+                            
+            .section.no-pad-bot
+                .container
+                    .row.center
+                        button.btn.indigo.waves-effect.waves-light(onclick="window.location.href='/'")
+                                    | Return 
+                                    
+                             
+        footer.page-footer.indigo
+            .footer-copyright
+
+        // Scripts
+        script(src='https://code.jquery.com/jquery-2.1.1.min.js')
+        script(src='js/materialize.js')
+
+
