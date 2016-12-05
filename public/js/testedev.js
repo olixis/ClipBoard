@@ -24,6 +24,7 @@ $(function() {
             status.empty();
             bar.show();
             var percentVal = '0%';
+            document.getElementById('btnUp').disabled = true;
             percent.width(percentVal);
         },
         uploadProgress: function(event, position, total, percentComplete) {
@@ -32,7 +33,7 @@ $(function() {
         },
         complete: function(xhr) {
             if(xhr.status === 500){
-               window.location.href='http://localhost:3000/500';
+               window.location.href='http://www.clipboard.host/500';
             }
             grecaptcha.reset();
             document.getElementById('btnUp').disabled = true;
